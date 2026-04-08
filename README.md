@@ -34,6 +34,11 @@ Generate the database schema and seed initial data:
 ```bash
 npx prisma migrate dev --name init
 ```
+Generate the prisma client dependencies:
+
+```bash
+npx prisma generate
+```
 
 ### 4. Start the Application
 

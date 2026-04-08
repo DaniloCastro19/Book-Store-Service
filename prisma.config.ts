@@ -9,6 +9,7 @@ export default {
     seed: 'tsx prisma/seed.ts',
   },
   datasource: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     url: env('DATABASE_URL'),
   },
 } satisfies PrismaConfig;
