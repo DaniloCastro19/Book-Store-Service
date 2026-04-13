@@ -18,9 +18,4 @@ export class AuthController {
     const { email, password } = singInDto;
     return this.authService.signIn(email, password);
   }
-
-  @Post('logout')
-  logout() {
-    return this.authService.logout();
-  }
 }

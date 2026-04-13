@@ -2,11 +2,12 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
-import { AccessToken, LogoutResponse } from './dto/response.dto';
+import { AccessToken } from './dto/response.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,14 +33,16 @@ export class AuthService {
     };
   }
 
-  async signUp(
-    email: string,
-    pass: string,
-    name: string,
-  ): Promise<AccessToken> {
+  async signUp(email: string, pass: string, name: string): Promise<string> {
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
       throw new BadRequestException('User already exists');
+    }
+
+    if (pass.length < 6) {
+      throw new BadRequestException(
+        'Password must be at least 6 characters long',
+      );
     }
 
     const hashedPassword = await bcrypt.hash(pass, 10);
@@ -49,13 +52,10 @@ export class AuthService {
       name,
     });
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
-  }
+    if (!user) {
+      throw new InternalServerErrorException('Error on user creation');
+    }
 
-  logout(): LogoutResponse {
-    return { message: 'Logged out successfully' };
+    return 'User Registered successfully';
   }
 }

@@ -12,6 +12,7 @@ async function bootstrap() {
       'API for book loans management with Google Books integration',
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
