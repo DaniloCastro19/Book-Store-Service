@@ -1,13 +1,8 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
-import { AccessToken } from './dto/response.dto';
+import { LoginResponse, UserRegisterResponse } from './dto/response.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,33 +11,49 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, pass: string): Promise<AccessToken> {
+  async signIn(email: string, pass: string): Promise<LoginResponse> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      return {
+        message: 'Invalid credentials',
+        access_token: undefined,
+      };
     }
 
     const isPasswordValid = await bcrypt.compare(pass, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      return {
+        message: 'Invalid credentials',
+        access_token: undefined,
+      };
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = { email: user.email, name: user.name ?? '' };
     return {
+      message: 'Login successful',
+      user: payload,
       access_token: await this.jwtService.signAsync(payload),
     };
   }
 
-  async signUp(email: string, pass: string, name: string): Promise<string> {
+  async signUp(
+    email: string,
+    pass: string,
+    name: string,
+  ): Promise<UserRegisterResponse> {
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
-      throw new BadRequestException('User already exists');
+      return {
+        message: 'Email already in use',
+        user: undefined,
+      };
     }
 
     if (pass.length < 6) {
-      throw new BadRequestException(
-        'Password must be at least 6 characters long',
-      );
+      return {
+        message: 'Password must be at least 6 characters long',
+        user: undefined,
+      };
     }
 
     const hashedPassword = await bcrypt.hash(pass, 10);
@@ -53,9 +64,18 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new InternalServerErrorException('Error on user creation');
+      return {
+        message: 'User registration failed. Internal error occurred.',
+        user: undefined,
+      };
     }
 
-    return 'User Registered successfully';
+    return {
+      message: 'User Registered successfully',
+      user: {
+        email: user.email,
+        name: user.name ?? '',
+      },
+    };
   }
 }

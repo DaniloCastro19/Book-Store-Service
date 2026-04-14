@@ -7,15 +7,15 @@ import { SingInDto } from './dto/singIn.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  @Post('singUp')
-  signUp(@Body() singUpDto: SignUpDto) {
-    const { email, password, name } = singUpDto;
+  @Post('signUp')
+  signUp(@Body() signUpDto: SignUpDto) {
+    const { email, password, name } = signUpDto;
     return this.authService.signUp(email, password, name);
   }
 
-  @Post('singIn')
-  signIn(@Body() singInDto: SingInDto) {
-    const { email, password } = singInDto;
+  @Post('signIn')
+  signIn(@Body() signInDto: SingInDto) {
+    const { email, password } = signInDto;
     return this.authService.signIn(email, password);
   }
 }
