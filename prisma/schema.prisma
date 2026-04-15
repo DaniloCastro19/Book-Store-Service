@@ -1,7 +1,5 @@
 generator client {
-  provider     = "prisma-client-js"
-  output       = "./generated/prisma"
-  moduleFormat = "cjs"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -23,7 +21,7 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
-  name      String?
+  name      String
   role      Role     @default(USER)
   loans     Loan[]
   createdAt DateTime @default(now())
