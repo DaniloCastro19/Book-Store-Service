@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import PrismaService from '../../common/infrastructure/services/prisma.service';
@@ -60,14 +64,22 @@ export class BooksService {
     });
   }
 
-  // Creates or updates from frontend data, which is used when syncing with Google Books API
+  // Creates a book only if googleBookId doesn't exist. Returns existing book if duplicate.
   async upsertFromGoogleData(dto: CreateBookDto) {
     const { googleBooksId, title, authors, description, coverImage, category } =
       dto;
-    return await this.prismaService.book.upsert({
+
+    const existing = await this.prismaService.book.findUnique({
       where: { googleBooksId },
-      update: { title, authors, description, coverImage, category },
-      create: {
+    });
+    if (existing) {
+      throw new BadRequestException(
+        'Book with this Google Books ID already exists',
+      );
+    }
+
+    return await this.prismaService.book.create({
+      data: {
         googleBooksId,
         title,
         authors,
