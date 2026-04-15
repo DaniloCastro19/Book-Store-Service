@@ -8,9 +8,6 @@ export interface UserRegisterResponse {
 
 export interface LoginResponse {
   message: string;
-  user?: {
-    email: string;
-    name: string;
-  };
+  payload?: { sub: string; email: string; name: string; role: string };
   access_token?: string;
 }

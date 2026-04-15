@@ -28,10 +28,15 @@ export class AuthService {
       };
     }
 
-    const payload = { email: user.email, name: user.name ?? '' };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    };
     return {
       message: 'Login successful',
-      user: payload,
+      payload: payload,
       access_token: await this.jwtService.signAsync(payload),
     };
   }
