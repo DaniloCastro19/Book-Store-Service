@@ -64,7 +64,7 @@ export class BooksService {
     });
   }
 
-  // Creates a book only if googleBookId doesn't exist. Returns existing book if duplicate.
+  // Creates a book only if googleBookId doesn't exist.
   async upsertFromGoogleData(dto: CreateBookDto) {
     const { googleBooksId, title, authors, description, coverImage, category } =
       dto;
