@@ -14,8 +14,8 @@ export class UsersService {
     });
   }
 
-  findAll() {
-    return this.prismaService.user.findMany();
+  async findAll() {
+    return await this.prismaService.user.findMany();
   }
 
   async findOne(id: string) {
@@ -32,7 +32,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return this.prismaService.user.update({
+    return await this.prismaService.user.update({
       where: { id },
       data: updateUserDto,
     });
