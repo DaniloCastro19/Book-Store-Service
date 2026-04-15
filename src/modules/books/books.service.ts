@@ -8,13 +8,13 @@ export class BooksService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createBookDto: CreateBookDto) {
-    return this.prismaService.book.create({
+    return await this.prismaService.book.create({
       data: createBookDto,
     });
   }
 
   async findAll() {
-    return this.prismaService.book.findMany();
+    return await this.prismaService.book.findMany();
   }
 
   async findOne(id: string) {
@@ -27,6 +27,57 @@ export class BooksService {
     return book;
   }
 
+  async findByGoogleId(googleBooksId: string) {
+    return await this.prismaService.book.findUnique({
+      where: { googleBooksId },
+    });
+  }
+
+  // Books with no loan with (without ACTIVE o OVERDUE state)
+  async findAvailable() {
+    const books = await this.prismaService.book.findMany({
+      where: {
+        loans: {
+          none: {
+            status: { in: ['ACTIVE', 'OVERDUE'] },
+          },
+        },
+      },
+    });
+    return books;
+  }
+
+  // List currently loaned books (with ACTIVE or OVERDUE status)
+  async findLoaned() {
+    return await this.prismaService.book.findMany({
+      where: {
+        loans: {
+          some: {
+            status: { in: ['ACTIVE', 'OVERDUE'] },
+          },
+        },
+      },
+    });
+  }
+
+  // Creates or updates from frontend data, which is used when syncing with Google Books API
+  async upsertFromGoogleData(dto: CreateBookDto) {
+    const { googleBooksId, title, authors, description, coverImage, category } =
+      dto;
+    return await this.prismaService.book.upsert({
+      where: { googleBooksId },
+      update: { title, authors, description, coverImage, category },
+      create: {
+        googleBooksId,
+        title,
+        authors,
+        description,
+        coverImage,
+        category,
+      },
+    });
+  }
+
   async update(id: string, updateBookDto: UpdateBookDto) {
     const book = await this.prismaService.book.findUnique({
       where: { id },
@@ -34,13 +85,14 @@ export class BooksService {
     if (!book) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
-    return this.prismaService.book.update({
+    return await this.prismaService.book.update({
       where: { id },
       data: updateBookDto,
     });
   }
 
   async remove(id: string) {
+    // TODO: Check if the book don't have any active or overdue loan before deleting
     const book = await this.prismaService.book.findUnique({
       where: { id },
     });

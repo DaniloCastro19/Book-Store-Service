@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsArray,
-  IsOptional,
-  IsNumber,
-  IsPositive,
-} from 'class-validator';
+import { IsString, IsArray, IsOptional, IsUrl } from 'class-validator';
 
 export class CreateBookDto {
   @ApiProperty()
@@ -16,7 +10,7 @@ export class CreateBookDto {
   @IsString()
   title!: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: [String] })
   @IsArray()
   @IsString({ each: true })
   authors!: string[];
@@ -28,23 +22,11 @@ export class CreateBookDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsString()
+  @IsUrl()
   coverImage?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   category?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  totalStock?: number;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @IsPositive()
-  availableStock?: number;
 }
