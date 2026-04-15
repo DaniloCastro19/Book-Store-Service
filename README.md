@@ -39,6 +39,10 @@ Generate the prisma client dependencies:
 ```bash
 npx prisma generate
 ```
+**Usefull utility** (Allows you to visualize Prisma schema & relations):
+```bash
+npx prisma studio
+```
 
 ### 4. Start the Application
 
