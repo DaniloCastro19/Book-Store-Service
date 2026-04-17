@@ -49,7 +49,7 @@ export class BooksService {
       where: { googleBooksId },
       include: {
         loans: {
-          select: { status: true },
+          select: { id: true, status: true, userId: true },
           where: { status: { in: ['ACTIVE', 'OVERDUE'] } },
         },
       },
