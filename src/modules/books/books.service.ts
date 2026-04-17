@@ -9,6 +9,19 @@ import PrismaService from '../../common/infrastructure/services/prisma.service';
 
 @Injectable()
 export class BooksService {
+  private readonly bookMokedReponse = {
+    id: '',
+    googleBooksId: '',
+    title: '',
+    authors: [],
+    description: '',
+    coverImage: '',
+    category: '',
+    createdAt: '',
+    updatedAt: '',
+    loans: [],
+  };
+
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createBookDto: CreateBookDto) {
@@ -32,9 +45,20 @@ export class BooksService {
   }
 
   async findByGoogleId(googleBooksId: string) {
-    return await this.prismaService.book.findUnique({
+    const book = await this.prismaService.book.findUnique({
       where: { googleBooksId },
+      include: {
+        loans: {
+          select: { status: true },
+          where: { status: { in: ['ACTIVE', 'OVERDUE'] } },
+        },
+      },
     });
+
+    if (!book) {
+      return this.bookMokedReponse;
+    }
+    return book;
   }
 
   // Books with no loan with (without ACTIVE o OVERDUE state)

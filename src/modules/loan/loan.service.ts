@@ -131,8 +131,6 @@ export class LoanService {
   }
 
   async returnLoan(loanId: string, userId: string) {
-    console.log('UserId: ', userId);
-
     const loan = await this.prismaService.loan.findUnique({
       where: { id: loanId },
       include: { book: true },

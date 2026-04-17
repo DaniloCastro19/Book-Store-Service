@@ -16,7 +16,6 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 
 @ApiTags('books')
 @ApiBearerAuth()
-@UseGuards(JwtGuard)
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
@@ -57,6 +56,7 @@ export class BooksController {
 
   @Post()
   @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @ApiOperation({ summary: 'Create a new book' })
   create(@Body() createBookDto: CreateBookDto) {
     return this.booksService.create(createBookDto);
@@ -64,6 +64,7 @@ export class BooksController {
 
   @Put(':id')
   @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @ApiOperation({ summary: 'Update an existing book' })
   async update(@Param('id') id: string, @Body() dto: UpdateBookDto) {
     return this.booksService.update(id, dto);
@@ -71,6 +72,7 @@ export class BooksController {
 
   @Delete(':id')
   @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @ApiOperation({
     summary: 'Delete a book. Fails if book has active/overdue loan.',
   })
