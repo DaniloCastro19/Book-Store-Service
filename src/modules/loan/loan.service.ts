@@ -86,7 +86,7 @@ export class LoanService {
     }
 
     // Ensure the book exist in DB (or create them with the provided data)
-    const book = await this.booksService.upsertFromGoogleData({
+    const book = await this.booksService.upsertOrReturnFromGoogleData({
       googleBooksId: dto.googleBooksId,
       title: dto.title,
       authors: dto.authors,

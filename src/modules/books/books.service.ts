@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import PrismaService from '../../common/infrastructure/services/prisma.service';
@@ -89,7 +85,7 @@ export class BooksService {
   }
 
   // Creates a book only if googleBookId doesn't exist.
-  async upsertFromGoogleData(dto: CreateBookDto) {
+  async upsertOrReturnFromGoogleData(dto: CreateBookDto) {
     const { googleBooksId, title, authors, description, coverImage, category } =
       dto;
 
@@ -97,9 +93,7 @@ export class BooksService {
       where: { googleBooksId },
     });
     if (existing) {
-      throw new BadRequestException(
-        'Book with this Google Books ID already exists',
-      );
+      return existing;
     }
 
     return await this.prismaService.book.create({
